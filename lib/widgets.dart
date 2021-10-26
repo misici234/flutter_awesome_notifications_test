@@ -14,7 +14,7 @@ class AppBarTitle extends StatelessWidget {
           FontAwesomeIcons.seedling,
           color: Colors.teal[50],
         ),
-        const Text('GreenThumbs'),
+        const Text('Green Thumbs'),
       ],
     );
   }
@@ -53,8 +53,7 @@ class HomePageButtons extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               style: ButtonStyle(
-                padding: MaterialStateProperty.all(
-                    const EdgeInsets.symmetric(vertical: 20)),
+                padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 20)),
                 backgroundColor: MaterialStateProperty.all(
                   Colors.teal[600],
                 ),
@@ -87,8 +86,7 @@ class HomePageButtons extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               style: ButtonStyle(
-                padding: MaterialStateProperty.all(
-                    const EdgeInsets.symmetric(vertical: 20)),
+                padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 20)),
                 backgroundColor: MaterialStateProperty.all(
                   Colors.teal[600],
                 ),
@@ -121,8 +119,7 @@ class HomePageButtons extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               style: ButtonStyle(
-                padding: MaterialStateProperty.all(
-                    const EdgeInsets.symmetric(vertical: 20)),
+                padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 20)),
                 backgroundColor: MaterialStateProperty.all(
                   Colors.teal[600],
                 ),

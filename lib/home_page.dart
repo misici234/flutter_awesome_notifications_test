@@ -14,10 +14,13 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance!.addObserver(this);
+
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
       if (!isAllowed) {
         showDialog(
@@ -39,9 +42,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               TextButton(
-                  onPressed: () => AwesomeNotifications()
-                      .requestPermissionToSendNotifications()
-                      .then((_) => Navigator.pop(context)),
+                  onPressed: () =>
+                      AwesomeNotifications().requestPermissionToSendNotifications().then((_) => Navigator.pop(context)),
                   child: Text(
                     'Allow',
                     style: TextStyle(
@@ -67,8 +69,7 @@ class _HomePageState extends State<HomePage> {
     AwesomeNotifications().actionStream.listen((notification) {
       if (notification.channelKey == 'basic_channel' && Platform.isIOS) {
         AwesomeNotifications().getGlobalBadgeCounter().then(
-              (value) =>
-                  AwesomeNotifications().setGlobalBadgeCounter(value - 1),
+              (value) => AwesomeNotifications().setGlobalBadgeCounter(value - 1),
             );
       }
 
@@ -86,7 +87,48 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     AwesomeNotifications().actionSink.close();
     AwesomeNotifications().createdSink.close();
+    WidgetsBinding.instance!.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    final DateTime alcsChangedAt = DateTime.now().toUtc();
+
+    switch (state) {
+      case AppLifecycleState.inactive:
+        print('App went to the foreground inactive state at $alcsChangedAt');
+        break;
+
+      case AppLifecycleState.paused:
+        print('App went to background at $alcsChangedAt');
+        Future<int>.value(1).then((int value) async {
+          await Future.delayed(const Duration(seconds: 1)); // this is the most important to reproduce this problem
+          // Above Future delay is a web API call, for example, to get upcoming appointments
+          await AwesomeNotifications().createNotification(
+            content: NotificationContent(
+              id: createUniqueId(),
+              channelKey: 'scheduled_channel',
+              title: '${Emojis.wheater_droplet} Add some water to your plant!',
+              body: 'Water your plant regularly to keep it healthy.',
+              notificationLayout: NotificationLayout.Default,
+            ),
+            actionButtons: [
+              NotificationActionButton(
+                key: 'MARK_DONE',
+                label: 'Mark Done',
+              ),
+            ],
+            schedule: NotificationCalendar.fromDate(date: DateTime.now().add(Duration(seconds: 5))),
+          );
+        });
+        break;
+
+      case AppLifecycleState.resumed:
+        print('App resumed from background at $alcsChangedAt');
+    }
   }
 
   @override
@@ -123,8 +165,7 @@ class _HomePageState extends State<HomePage> {
             HomePageButtons(
               onPressedOne: createPlantFoodNotification,
               onPressedTwo: () async {
-                NotificationWeekAndTime? pickedSchedule =
-                    await pickSchedule(context);
+                NotificationWeekAndTime? pickedSchedule = await pickSchedule(context);
 
                 if (pickedSchedule != null) {
                   createWaterReminderNotification(pickedSchedule);

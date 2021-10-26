@@ -27,13 +27,17 @@ void main() {
 }
 
 class AppWidget extends StatelessWidget {
+  final ThemeData theme = ThemeData(
+    primaryColor: Colors.teal,
+    appBarTheme: AppBarTheme(backgroundColor: Colors.teal),
+  );
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.teal,
-        accentColor: Colors.tealAccent,
+      theme: theme.copyWith(
+        colorScheme: theme.colorScheme.copyWith(secondary: Colors.tealAccent),
       ),
       title: 'Green Thumbs',
       home: HomePage(),
